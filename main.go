@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/messaging"
 	"github.com/joho/godotenv"
+	"google.golang.org/api/option"
 )
 
 func main() {
@@ -36,8 +38,22 @@ func main() {
 	sendToFCM(ctx, params)
 }
 
+func loadParamsFromFile(filepath string) (res Message, err error) {
+	reader, err := os.Open(filepath)
+	if err == nil {
+		defer reader.Close()
+		err = json.NewDecoder(reader).Decode(&res)
+	}
+	return
+}
+
 func sendToFCM(ctx context.Context, params Message) {
-	app, err := firebase.NewApp(ctx, nil)
+	serviceAccountJSON, err := loadServiceAccountJSON(os.Getenv("FCM_SERVICE_ACCOUNT_FILE"))
+	if err != nil {
+		log.Fatalf("error read service account file: %v\n", err)
+	}
+
+	app, err := firebase.NewApp(ctx, nil, option.WithCredentialsJSON(serviceAccountJSON))
 	if err != nil {
 		log.Fatalf("error initializing app: %v\n", err)
 	}
@@ -75,11 +91,11 @@ func sendToFCM(ctx context.Context, params Message) {
 	}
 }
 
-func loadParamsFromFile(filepath string) (res Message, err error) {
+func loadServiceAccountJSON(filepath string) (res []byte, err error) {
 	reader, err := os.Open(filepath)
 	if err == nil {
 		defer reader.Close()
-		err = json.NewDecoder(reader).Decode(&res)
+		res, err = ioutil.ReadAll(reader)
 	}
 	return
 }
