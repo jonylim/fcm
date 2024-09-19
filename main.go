@@ -61,6 +61,7 @@ func sendToFCM(ctx context.Context, params Message) {
 			}
 		}
 		msg := &messaging.Message{
+			Data:         params.Data,
 			Notification: msgNotif,
 			Android:      msgAndroid,
 			Token:        token,
