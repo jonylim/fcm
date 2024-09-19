@@ -1,0 +1,14 @@
+{
+    "tokens": [
+        "REGISTRATION_TOKEN_1",
+        "REGISTRATION_TOKEN_2",
+        "REGISTRATION_TOKEN_3"
+    ],
+    "notification": {
+        "title": "TITLE",
+        "body": "BODY"
+    },
+    "android": {
+        "priority": "high"
+    }
+}
